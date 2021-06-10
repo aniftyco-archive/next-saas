@@ -5,7 +5,7 @@ const config = { cors: {} };
 
 const options: CorsOptions = {
   origin: '*',
-  methods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATH', 'DELETE'],
+  methods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Authorization', 'Accept', 'Content-Type'],
 };
 
