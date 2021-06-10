@@ -1,5 +1,4 @@
-import handler from 'lib/api-handler';
-import prisma from 'lib/prisma';
+import handler, { prisma } from 'next-saas';
 
 export default handler
   .get<{ id: string }>(async ({ req }) => {
