@@ -1,15 +1,6 @@
-import handler, { Middleware, UnauthorizedError, prisma } from 'next-saas';
-
-const protect = (): Middleware => (ctx, next) => {
-  if (!ctx.user) {
-    throw new UnauthorizedError();
-  }
-
-  return next();
-};
+import handler, { prisma } from 'next-saas';
 
 export default handler
-  .use(protect())
   .get(async ({ user }) => {
     console.log(user);
     return prisma.user.findMany();
