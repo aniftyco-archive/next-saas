@@ -5,10 +5,10 @@
   "scripts": {
     "start": "next dev --port 9000",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma db push"
+    "prisma:migrate": "prisma migrate dev"
   },
   "prisma": {
-    "schema": "./schema.prisma"
+    "schema": "./db/schema.prisma"
   },
   "eslintConfig": {
     "extends": "nifty/react",
