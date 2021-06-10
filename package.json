@@ -1,0 +1,43 @@
+{
+  "name": "next-saas",
+  "description": "Rapid development of SaaS products with Next.js",
+  "version": "0.0.0",
+  "repository": "aniftyco/next-saas",
+  "main": "lib/index.js",
+  "author": {
+    "name": "Nifty Development, LLC",
+    "email": "support@aniftyco.com",
+    "url": "https://aniftyco.com"
+  },
+  "contributors": [
+    {
+      "name": "Josh Manders",
+      "url": "https://twitter.com/joshmanders"
+    }
+  ],
+  "workspaces": [
+    "packages/**",
+    "examples/**"
+  ],
+  "eslintConfig": {
+    "extends": "nifty"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.12.2",
+    "eslint": "^7.28.0",
+    "eslint-config-nifty": "^3.2.2",
+    "jest": "^27.0.4",
+    "prettier": "^2.3.1",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.2"
+  }
+}
