@@ -1,9 +1,9 @@
 {
   "name": "basic-example",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "next dev --port 9000",
+    "start": "saas dev --port 9000",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
@@ -20,6 +20,7 @@
   "dependencies": {
     "@prisma/client": "^2.24.1",
     "next": "10.2.3",
+    "next-saas": "*",
     "prisma": "^2.24.1",
     "react": "17.0.2",
     "react-dom": "17.0.2"
