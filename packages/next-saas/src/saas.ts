@@ -24,6 +24,7 @@ const commands: { [command: string]: () => Promise<cliCommand> } = {
   start: () => import('next/dist/cli/next-start').then((i) => i.nextStart),
   dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
+  worker: () => import('./cli/saas-worker').then((i) => i.saasWorker),
 };
 
 const args = arg(
