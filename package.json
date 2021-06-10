@@ -20,18 +20,7 @@
     "examples/**"
   ],
   "eslintConfig": {
-    "extends": "nifty/react",
-    "rules": {
-      "@typescript-eslint/require-await": "off",
-      "@typescript-eslint/ban-types": "off",
-      "@typescript-eslint/no-useless-constructor": "off",
-      "@typescript-eslint/no-misused-promises": "off",
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-unused-vars-experimental": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unnecessary-type-assertion": "off",
-      "react/react-in-jsx-scope": "off"
-    }
+    "extends": "nifty/react"
   },
   "prettier": {
     "printWidth": 120,
@@ -44,7 +33,7 @@
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.2",
     "eslint": "^7.28.0",
-    "eslint-config-nifty": "^3.2.2",
+    "eslint-config-nifty": "^3.3.0",
     "jest": "^27.0.4",
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
