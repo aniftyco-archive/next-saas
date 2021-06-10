@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prestart": "prisma generate",
-    "start": "next dev --port 9000"
+    "start": "next dev --port 9000",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma db push"
   },
   "prisma": {
     "schema": "./schema.prisma"
