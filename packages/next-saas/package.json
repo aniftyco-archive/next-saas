@@ -5,7 +5,8 @@
   "repository": "aniftyco/next-saas",
   "main": "lib/index.js",
   "scripts": {
-    "build": "rimraf lib && tsc"
+    "build": "rimraf lib && tsc",
+    "prepublishOnly": "npm run build"
   },
   "bin": {
     "saas": "bin/saas"
