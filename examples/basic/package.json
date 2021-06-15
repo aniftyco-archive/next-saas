@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@prisma/client": "^2.24.1",
-    "next": "10.2.3",
+    "next": "^11.0.0",
     "next-saas": "*",
     "prisma": "^2.24.1",
     "react": "17.0.2",
