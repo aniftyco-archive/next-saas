@@ -1,9 +1,15 @@
-import handler, { prisma } from 'next-saas';
+import handler, { db } from 'next-saas';
+import bcrypt from 'bcrypt';
 
 export default handler
   .get(async () => {
-    return prisma.user.findMany();
+    return db.user.findMany();
   })
-  .post(async ({ req }) => {
-    return prisma.user.create({ data: req.body });
+  .post<any, { name: string; email: string; password: string }>(async ({ req }) => {
+    const data = {
+      ...req.body,
+      password: await bcrypt.hash(req.body.password, 10),
+    };
+
+    return db.user.create({ data });
   });
