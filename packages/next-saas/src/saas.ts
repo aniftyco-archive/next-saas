@@ -71,7 +71,9 @@ if (!foundCommand && args['--help']) {
       $ saas <command>
 
     Available commands
-      ${Object.keys(commands).join(', ')}
+      ${Object.keys(commands)
+        .filter((command) => command !== 'export')
+        .join(', ')}
 
     Options
       --version, -v   Version number
