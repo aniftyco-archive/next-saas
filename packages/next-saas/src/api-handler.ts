@@ -25,11 +25,11 @@ export interface Response<Type = any> extends ServerResponse {
   redirect(status: number, url: string): Response<Type>;
 }
 
-export type Context<Q = any, B = any, C = any, T = any> = {
+export interface Context<Q = any, B = any, C = any, T = any> {
   req: Request<Q, B, C>;
   res: Response<T>;
   user: User | null;
-};
+}
 
 export type Middleware<Q = any, B = any, C = any, T = any> = (
   context: Context<Q, B, C, T>,
