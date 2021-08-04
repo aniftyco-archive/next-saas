@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import nc from 'next-connect';
+import { User } from '@prisma/client';
 import { APIError } from './errors';
 import { onError } from './middleware/onError';
 import { onNoMatch } from './middleware/onNoMatch';
 import middleware from './middleware';
-// import { User } from '@prisma/client';
 
 export type NextHandler = (err?: Error | APIError) => void | Promise<void>;
 
@@ -28,7 +28,7 @@ export interface Response<Type = any> extends ServerResponse {
 export type Context<Q = any, B = any, C = any, T = any> = {
   req: Request<Q, B, C>;
   res: Response<T>;
-  user: Record<string, any> | null;
+  user: User | null;
 };
 
 export type Middleware<Q = any, B = any, C = any, T = any> = (
@@ -66,48 +66,58 @@ export type APIHandler = {
   ): APIHandler;
 };
 
-const context: Partial<Context> = {
-  user: null,
-};
-
-const mwHandle = (use: any, ...middleware: Middleware[]) => {
+const mwHandle = (context: Partial<Context>, use: any, ...middleware: Middleware[]) => {
   return use(
     '/',
     ...middleware.map((ware) => async (req: Request, res: Response, next: NextHandler) => {
-      return ware({ ...context, req, res } as Context, next);
+      context.req = req;
+      context.res = res;
+
+      return ware(context as Context, next);
     })
   );
 };
 
-const handle = (action: any, handler: Handler) =>
+const handle = (context: Partial<Context>, action: any, handler: Handler) =>
   action(async (req: Request, res: Response) => {
-    return res.send(await handler({ ...context, req, res } as Context));
+    context.req = req;
+    context.res = res;
+
+    return res.send(await handler(context as Context));
   });
 
 const proxyHandler: ProxyHandler<(handler: Handler) => APIHandler> = {
   get: (_, method) => {
+    const context: Partial<Context> = {
+      user: null,
+    };
+
     const instance = nc({ onNoMatch, onError });
 
-    instance.get = handle.bind(null, instance.get);
-    instance.head = handle.bind(null, instance.head);
-    instance.options = handle.bind(null, instance.options);
-    instance.post = handle.bind(null, instance.post);
-    instance.put = handle.bind(null, instance.put);
-    instance.patch = handle.bind(null, instance.patch);
-    instance.delete = handle.bind(null, instance.delete);
-    instance.use = mwHandle.bind(null, instance.use);
+    instance.get = handle.bind(null, context, instance.get);
+    instance.head = handle.bind(null, context, instance.head);
+    instance.options = handle.bind(null, context, instance.options);
+    instance.post = handle.bind(null, context, instance.post);
+    instance.put = handle.bind(null, context, instance.put);
+    instance.patch = handle.bind(null, context, instance.patch);
+    instance.delete = handle.bind(null, context, instance.delete);
+    instance.use = mwHandle.bind(null, context, instance.use);
 
     return instance.use(...middleware)[method].bind(instance);
   },
 };
 
 export const handler = new Proxy((handler: Handler) => {
+  const context: Partial<Context> = {
+    user: null,
+  };
+
   const instance = nc({ onNoMatch, onError });
 
   instance.use = mwHandle.bind(null, instance.use);
 
   return instance.use(...middleware).all(async (req: Request, res: Response) => {
-    return res.send(await handler({ ...context, req, res } as Context));
+    return res.send(await handler(context as Context));
   }) as unknown;
 }, proxyHandler) as APIHandler;
 
