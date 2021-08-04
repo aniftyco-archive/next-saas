@@ -2,7 +2,9 @@
 import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
+import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
+import chalk from 'chalk';
 import { displayHelpForNextCommand } from './utils';
 
 loadEnvConfig(process.cwd());
@@ -20,10 +22,14 @@ loadEnvConfig(process.cwd());
 
 const defaultCommand = 'dev';
 export type cliCommand = (argv?: string[]) => void;
+const unsupportedCommand = (command: string) => () => {
+  printAndExit(`${chalk.red('>')} ${command} is an unsupported command in next-saas.`);
+};
 const commands: { [command: string]: () => Promise<cliCommand> } = {
-  start: () => import('next/dist/cli/next-start').then((i) => i.nextStart),
-  dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   build: () => import('next/dist/cli/next-build').then((i) => i.nextBuild),
+  start: () => import('next/dist/cli/next-start').then((i) => i.nextStart),
+  export: () => Promise.resolve(unsupportedCommand('export')),
+  dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
   db: () => import('./cli/saas-db').then((i) => i.saasDb),
   worker: () => import('./cli/saas-worker').then((i) => i.saasWorker),
