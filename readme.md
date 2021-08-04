@@ -8,8 +8,8 @@
 
 - Clone the repo locally
 - Run `npm install` using npm v7 or later in the root directory
-- Run `npm run -w basic-example prisma:migrate` to create and migrate the sqlite db
-- Run `npm run -w basic-example prisma:generate` to generate the client types
+- Run `npm run -w basic-example db:migrate` to create and migrate the sqlite db
+- Run `npm run -w basic-example db:generate` to generate the client types
 - Run `npm run -w next-saas build` to build next-saas
 - Run `npm run -w basic-example start` to boot up the server
 - Open your browser to `http://localhost:9000`
