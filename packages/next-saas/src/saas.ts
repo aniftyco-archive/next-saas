@@ -25,6 +25,7 @@ const commands: { [command: string]: () => Promise<cliCommand> } = {
   dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   build: () => import('next/dist/cli/next-build').then((i) => i.nextBuild),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
+  db: () => import('./cli/saas-db').then((i) => i.saasDb),
   worker: () => import('./cli/saas-worker').then((i) => i.saasWorker),
 };
 
@@ -87,7 +88,7 @@ if (args['--inspect'])
 // Make sure the `saas <subcommand> --help` case is covered
 if (args['--help']) {
   // only forward for our commands, use our internal help to write for next commands
-  if (['worker'].includes(command)) {
+  if (['db', 'worker'].includes(command)) {
     forwardedArgs.push('--help');
   } else {
     displayHelpForNextCommand(command);
