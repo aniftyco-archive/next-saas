@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "saas dev --port 9000",
+    "worker": "saas worker",
     "db:generate": "saas db generate",
     "db:migrate": "saas db migrate"
   },
