@@ -1,13 +1,7 @@
-import handler, { db, log } from 'next-saas';
+import handler, { db } from 'next-saas';
 
 export default handler
-  // .use(async (context, next) => {
-  //   context.user = await db.user.findFirst();
-
-  //   return next();
-  // })
-  .get<{ id: string }>(async ({ req, user }) => {
-    log.event(JSON.stringify(user));
+  .get<{ id: string }>(async ({ req }) => {
     return db.user.findFirst({
       where: { id: req.query.id },
     });
