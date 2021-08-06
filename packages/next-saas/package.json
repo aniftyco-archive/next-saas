@@ -20,7 +20,9 @@
     "bull": "^3.27.0",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",
+    "handlebars": "^4.7.7",
     "next-connect": "^0.10.2",
+    "nodemailer": "^6.6.3",
     "p-event": "^4.2.0",
     "ts-node": "^10.1.0",
     "uuid": "^8.3.2"
@@ -34,6 +36,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/bull": "^3.15.3",
     "@types/cors": "^2.8.12",
+    "@types/nodemailer": "^6.4.4",
     "@types/uuid": "^8.3.1"
   }
 }
