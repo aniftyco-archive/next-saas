@@ -1,5 +1,5 @@
 import { printAndExit } from 'next/dist/server/lib/utils';
-import { cliCommand } from '../saas';
+import { cliCommand } from '../cli';
 
 export const saasDb: cliCommand = async (argv) => {
   const args = [];

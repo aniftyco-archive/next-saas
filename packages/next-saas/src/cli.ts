@@ -32,8 +32,8 @@ const commands: { [command: string]: () => Promise<cliCommand> } = {
   dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
   lint: () => import('next/dist/cli/next-lint').then((i) => i.nextLint),
-  db: () => import('./cli/saas-db').then((i) => i.saasDb),
-  worker: () => import('./cli/saas-worker').then((i) => i.saasWorker),
+  db: () => import('./commands/db').then((i) => i.saasDb),
+  worker: () => import('./commands/worker').then((i) => i.saasWorker),
 };
 
 const args = arg(
