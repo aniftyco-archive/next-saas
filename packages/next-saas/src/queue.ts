@@ -1,11 +1,15 @@
-import Queue, { JobOptions, ProcessCallbackFunction } from 'bull';
+import Bull, { JobOptions, ProcessCallbackFunction } from 'bull';
 
-const queue = new Queue('next-saas', process.env.REDIS_URL);
+export class Queue {
+  private bull = new Bull('next-saas', process.env.REDIS_URL);
 
-export const dispatch = <Data = Record<string, any>>(name: string, data: Data, options?: JobOptions) => {
-  return queue.add({ $name: name, ...data }, options);
-};
+  public async dispatch<Data = Record<string, any>>(name: string, data: Data, options?: JobOptions) {
+    return this.bull.add({ $name: name, ...data }, options);
+  }
 
-export const work = (handler: ProcessCallbackFunction<any>) => {
-  return queue.process(handler);
-};
+  public async work(handler: ProcessCallbackFunction<any>) {
+    return this.bull.process(handler);
+  }
+}
+
+export const queue = new Queue();

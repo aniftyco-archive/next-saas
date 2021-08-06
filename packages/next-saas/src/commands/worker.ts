@@ -2,7 +2,7 @@ import { resolve, basename } from 'path';
 import { readdirSync } from 'fs';
 import * as log from 'next/dist/build/output/log';
 import { cliCommand } from '../cli';
-import * as queue from '../queue';
+import { queue } from '../queue';
 
 const jobsDir = resolve(process.cwd(), 'jobs');
 

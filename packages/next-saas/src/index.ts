@@ -1,6 +1,6 @@
 export * from './api-handler';
 export * from './errors';
-export * as queue from './queue';
+export * from './queue';
 export { prisma as db, prisma } from './prisma';
 export { default } from './api-handler';
 
