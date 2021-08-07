@@ -1,5 +1,8 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import chalk from 'chalk';
+import { PackageJson } from 'type-fest';
 
 const help = {
   build: `
@@ -111,3 +114,12 @@ const help = {
 export const displayHelpForNextCommand = (command: string) => {
   printAndExit(help[command], 0);
 };
+
+export const readPkg = (dir: string) => {
+  const filePath = resolve(dir, 'package.json');
+  const pkg = readFileSync(filePath, 'utf-8');
+
+  return JSON.parse(pkg) as PackageJson;
+};
+
+export const pkg = readPkg(process.cwd());
