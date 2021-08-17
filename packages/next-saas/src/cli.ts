@@ -121,7 +121,7 @@ process.on('SIGINT', () => process.exit(0));
 commands[command]().then((exec) => exec(forwardedArgs));
 
 if (command === 'dev') {
-  const { CONFIG_FILE } = require('next/dist/next-server/lib/constants');
+  const { CONFIG_FILE } = require('next/dist/shared/lib/constants');
   const { watchFile } = require('fs');
   watchFile(`${process.cwd()}/${CONFIG_FILE}`, (cur: any, prev: any) => {
     if (cur.size > 0 || prev.size > 0) {
