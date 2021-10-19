@@ -8,9 +8,10 @@ import middleware from './middleware';
 
 export type NextHandler = (err?: Error | APIError) => void | Promise<void>;
 
-export interface Request<Query = any, Body = any, Cookies = any> extends IncomingMessage {
+export interface Request<Params = any, Body = any, Cookies = any> extends IncomingMessage {
   id: string;
-  query: Query;
+  ipAddress: string;
+  query: Params;
   cookies: Cookies;
   body: Body;
 }
@@ -25,74 +26,97 @@ export interface Response<Type = any> extends ServerResponse {
   redirect(status: number, url: string): Response<Type>;
 }
 
-export interface Context<Q = any, B = any, C = any, T = any> {
-  req: Request<Q, B, C>;
-  res: Response<T>;
+export interface Context<Params = any, Body = any, Cookies = any, Type = any> {
+  req: Request<Params, Body, Cookies>;
+  res: Response<Type>;
+  request: Request<Params, Body, Cookies>;
+  response: Response<Type>;
   user: User | null;
 }
 
-export type Middleware<Q = any, B = any, C = any, T = any> = (
-  context: Context<Q, B, C, T>,
+export type Middleware<Params = any, Body = any, Cookies = any, Type = any> = (
+  context: Context<Params, Body, Cookies, Type>,
   next: NextHandler
 ) => any | Promise<any>;
 
-export type Handler<Q = any, B = any, C = any, T = any> = (context: Context<Q, B, C, T>) => any | Promise<any>;
+export type Handler<Params = any, Body = any, Cookies = any, Type = any> = (
+  cookiesontext: Context<Params, Body, Cookies, Type>
+) => any | Promise<any>;
 
 export type APIHandler = {
   (handler: Handler): void;
-  use<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    ...handlers: Middleware<Q, B, C, T>[]
+  use<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
+    ...handlers: Middleware<Params, Body, Cookies, Type>[]
   ): APIHandler;
-  get<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  get<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  head<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  head<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  options<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  options<
+    Params = Record<string, string | any>,
+    Body = Record<string, any>,
+    Cookies = Record<string, string>,
+    Type = any
+  >(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  post<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  post<Body = Record<string, any>, Params = Record<string, string | any>, Cookies = Record<string, string>, Type = any>(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  put<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  put<Body = Record<string, any>, Params = Record<string, string | any>, Cookies = Record<string, string>, Type = any>(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  patch<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  patch<
+    Body = Record<string, any>,
+    Params = Record<string, string | any>,
+    Cookies = Record<string, string>,
+    Type = any
+  >(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
-  delete<Q = Record<string, string | string[]>, B = any, C = Record<string, string>, T = any>(
-    handler: Handler<Q, B, C, T>
+  delete<
+    Params = Record<string, string | any>,
+    Body = Record<string, any>,
+    Cookies = Record<string, string>,
+    Type = any
+  >(
+    handler: Handler<Params, Body, Cookies, Type>
   ): APIHandler;
 };
 
-const mwHandle = (context: Partial<Context>, use: any, ...middleware: Middleware[]) => {
+const mwHandle = (context: Context, use: any, ...middleware: Middleware[]) => {
   return use(
     '/',
     ...middleware.map((ware) => async (req: Request, res: Response, next: NextHandler) => {
-      context.req = req;
-      context.res = res;
-
-      return ware(context as Context, next);
+      return ware(context, next);
     })
   );
 };
 
-const handle = (context: Partial<Context>, action: any, handler: Handler) =>
+const handle = (context: Context, action: any, handler: Handler) =>
   action(async (req: Request, res: Response) => {
-    context.req = req;
-    context.res = res;
+    const response = await handler(context);
 
-    return res.send(await handler(context as Context));
+    return res.send(response);
   });
 
+const setupContext = (context: Partial<Context>) => (req: Request, res: Response, next: NextHandler) => {
+  req.ipAddress =
+    ((req.headers['x-forwarded-for'] as string) || '').split(',').pop().trim() || req.socket.remoteAddress;
+  context.req = req;
+  context.res = res;
+
+  return next();
+};
 const proxyHandler: ProxyHandler<(handler: Handler) => APIHandler> = {
   get: (_, method) => {
     const context: Partial<Context> = {
       user: null,
     };
 
-    const instance = nc({ onNoMatch, onError });
+    const instance = nc({ onNoMatch, onError }).use(setupContext(context));
 
     instance.get = handle.bind(null, context, instance.get);
     instance.head = handle.bind(null, context, instance.head);
@@ -112,12 +136,14 @@ export const handler = new Proxy((handler: Handler) => {
     user: null,
   };
 
-  const instance = nc({ onNoMatch, onError });
+  const instance = nc({ onNoMatch, onError }).use(setupContext(context));
 
-  instance.use = mwHandle.bind(null, instance.use);
+  instance.use = mwHandle.bind(null, context, instance.use);
 
   return instance.use(...middleware).all(async (req: Request, res: Response) => {
-    return res.send(await handler(context as Context));
+    const response = await handler(context as Context);
+
+    return res.send(response);
   }) as unknown;
 }, proxyHandler) as APIHandler;
 

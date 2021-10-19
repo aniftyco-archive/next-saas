@@ -1,17 +1,27 @@
 import handler, { db } from 'next-saas';
 
+type QueryParams = {
+  id: string;
+};
+
+type UpdateUserInput = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 export default handler
-  .get<{ id: string }>(async ({ req }) => {
+  .get<QueryParams>(async ({ req }) => {
     return db.user.findFirst({
       where: { id: req.query.id },
     });
   })
-  .patch<{ id: string }>(async ({ req }) => {
+  .patch<UpdateUserInput, QueryParams>(async ({ req }) => {
     return db.user.update({
       where: { id: req.query.id },
       data: req.body,
     });
   })
-  .delete<{ id: string }>(async ({ req }) => {
+  .delete<QueryParams>(async ({ req }) => {
     return db.user.delete({ where: { id: req.query.id } });
   });
