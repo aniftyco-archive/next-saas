@@ -115,11 +115,9 @@ export const displayHelpForNextCommand = (command: string) => {
   printAndExit(help[command], 0);
 };
 
-export const readPkg = (dir: string) => {
-  const filePath = resolve(dir, 'package.json');
+export const readPkg = () => {
+  const filePath = resolve(global.__$NEXT_SAAS__.PWD, 'package.json');
   const pkg = readFileSync(filePath, 'utf-8');
 
   return JSON.parse(pkg) as PackageJson;
 };
-
-export const pkg = readPkg(process.cwd());

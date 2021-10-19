@@ -1,3 +1,4 @@
+import * as log from 'next/dist/build/output/log';
 import { Request, Response } from '../api-handler';
 import { APIError, InternalServerError } from '../errors';
 
@@ -6,7 +7,7 @@ export const onError = (err: APIError | Error, req: Request, res: Response) => {
     return err.render(req, res);
   }
 
-  console.error(err);
+  log.error(err as unknown as string);
 
   return new InternalServerError().render(req, res);
 };

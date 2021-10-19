@@ -1,13 +1,38 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { resolve } from 'path';
 import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
-import { displayHelpForNextCommand } from './utils';
+import { PackageJson } from 'type-fest';
+import { displayHelpForNextCommand, readPkg } from './utils';
+import { Middleware } from './api-handler';
 
-loadEnvConfig(process.cwd());
+declare global {
+  namespace NodeJS {
+    interface Global {
+      __$NEXT_SAAS__: {
+        PWD: string;
+        pkg: PackageJson;
+        autoload: Middleware[];
+      };
+    }
+  }
+}
+
+(global.__$NEXT_SAAS__ as any) = {};
+global.__$NEXT_SAAS__.PWD = process.cwd();
+global.__$NEXT_SAAS__.pkg = readPkg();
+global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
+  const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
+
+  return ware;
+});
+
+loadEnvConfig(global.__$NEXT_SAAS__.PWD);
 
 ['react', 'react-dom'].forEach((dependency) => {
   try {
@@ -73,7 +98,7 @@ if (!foundCommand && args['--help']) {
 
     Available commands
       ${Object.keys(commands)
-        .filter((command) => command !== 'export')
+        .filter((command) => ['export'].includes(command))
         .join(', ')}
 
     Options

@@ -9,6 +9,8 @@ const options: CorsOptions = {
   allowedHeaders: ['Authorization', 'Accept', 'Content-Type'],
 };
 
-export const setCors: Middleware = async ({ req, res }, next) => {
-  return cors({ ...options, ...config.cors })(req, res, next);
-};
+export const setCors =
+  (): Middleware =>
+  async ({ req, res }, next) => {
+    return cors({ ...options, ...config.cors })(req, res, next);
+  };

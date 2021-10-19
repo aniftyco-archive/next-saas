@@ -1,8 +1,7 @@
 import Bull, { JobOptions, ProcessCallbackFunction } from 'bull';
-import { pkg } from './utils';
 
 export class Queue {
-  private bull = new Bull(pkg.name, {
+  private bull = new Bull(global.__$NEXT_SAAS__.pkg.name, {
     redis: process.env.REDIS_URL,
     prefix: 'next-saas',
   });
