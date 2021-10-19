@@ -9,20 +9,22 @@ export class APIError<Data extends {} = Record<string, any>> extends Error {
     const response = {
       message: this.message,
       type: this.type,
-      data: undefined,
+      ...(this.data && this.data),
     };
-
-    if (this.data) {
-      response.data = this.data;
-    }
 
     return res.status(this.statusCode).send(response);
   }
 }
 
-export class InternalServerError<Data> extends APIError<Data> {
+export class BadRequestError<Data> extends APIError<Data> {
   constructor(message?: string, type?: string, data?: Data) {
-    super(message || 'Internal Server Error', 500, type || 'E_INTERNAL_SERVER_ERROR', data);
+    super(message || 'Bad Request', 400, type || 'E_BAD_REQUEST', data);
+  }
+}
+
+export class UnauthorizedError<Data> extends APIError<Data> {
+  constructor(message?: string, type?: string, data?: Data) {
+    super(message || 'Unauthorized', 401, type || 'E_UNAUTHORIZED', data);
   }
 }
 
@@ -32,14 +34,20 @@ export class NotFoundError<Data> extends APIError<Data> {
   }
 }
 
-export class MethodNotAllowed<Data> extends APIError<Data> {
+export class MethodNotAllowedError<Data> extends APIError<Data> {
   constructor(message?: string, type?: string, data?: Data) {
     super(message || 'Method Not Allowed', 405, type || 'E_METHOD_NOT_ALLOWED', data);
   }
 }
 
-export class UnauthorizedError<Data> extends APIError<Data> {
+export class ValidationError<Data> extends APIError<Data> {
   constructor(message?: string, type?: string, data?: Data) {
-    super(message || 'Unauthorized', 401, type || 'E_UNAUTHORIZED', data);
+    super(message || 'Unprocessable Entity', 422, type || 'E_UNPROCESSABLE_ENTITY', data);
+  }
+}
+
+export class InternalServerError<Data> extends APIError<Data> {
+  constructor(message?: string, type?: string, data?: Data) {
+    super(message || 'Internal Server Error', 500, type || 'E_INTERNAL_SERVER_ERROR', data);
   }
 }
