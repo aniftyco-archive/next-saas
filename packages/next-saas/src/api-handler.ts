@@ -4,7 +4,7 @@ import { User } from '@prisma/client';
 import { APIError } from './errors';
 import { onError } from './middleware/onError';
 import { onNoMatch } from './middleware/onNoMatch';
-import middleware from './middleware';
+import middleware, { autoload } from './middleware';
 
 export type NextHandler = (err?: Error | APIError) => void | Promise<void>;
 
@@ -127,7 +127,7 @@ const proxyHandler: ProxyHandler<(handler: Handler) => APIHandler> = {
     instance.delete = handle.bind(null, context, instance.delete);
     instance.use = mwHandle.bind(null, context, instance.use);
 
-    return instance.use(...middleware)[method].bind(instance);
+    return instance.use(...[...middleware, ...autoload()])[method].bind(instance);
   },
 };
 
@@ -140,7 +140,7 @@ export const handler = new Proxy((handler: Handler) => {
 
   instance.use = mwHandle.bind(null, context, instance.use);
 
-  return instance.use(...middleware).all(async (req: Request, res: Response) => {
+  return instance.use(...[...middleware, ...autoload()]).all(async (req: Request, res: Response) => {
     const response = await handler(context as Context);
 
     return res.send(response);
