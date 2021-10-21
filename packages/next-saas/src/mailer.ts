@@ -17,7 +17,7 @@ export type SendParams<Values = Record<string, any>> = {
   template: string;
   values?: Values;
   subject: string;
-  from: Recipient;
+  from?: Recipient;
   to: Recipient;
   cc?: Recipient;
   replyTo?: Recipient;
@@ -25,7 +25,6 @@ export type SendParams<Values = Record<string, any>> = {
 
 export class Mailer {
   private transport: NodeMailer<SMTPTransport.SentMessageInfo>;
-  private mailables: string = resolve(process.cwd(), 'mailables');
 
   constructor() {
     this.transport = nodemailer.createTransport(
@@ -42,7 +41,15 @@ export class Mailer {
   }
 
   private async render(view: string, values: Record<string, any> = {}) {
-    const template = await readFile(join(this.mailables, `${view}.html`), 'utf-8');
+    console.log(global.__$NEXT_SAAS__.config);
+    const template = await readFile(
+      resolve(
+        global.__$NEXT_SAAS__.config.mailer?.templates || resolve(global.__$NEXT_SAAS__.PWD, 'mailables'),
+        `${view}.html`
+      ),
+      'utf-8'
+    );
+    console.log(template);
     const html = compile(template)(values);
 
     return {
@@ -51,11 +58,16 @@ export class Mailer {
     };
   }
 
-  public async send<Values>({ template, values, ...envelope }: SendParams<Values>) {
+  public async send<Values>({ template, values, from, ...envelope }: SendParams<Values>) {
     const { html, text } = await this.render(template, values);
 
     try {
-      const { messageId } = await this.transport.sendMail({ ...envelope, html, text } as SendMailOptions);
+      const { messageId } = await this.transport.sendMail({
+        ...envelope,
+        from: global.__$NEXT_SAAS__.config.mailer?.from || from,
+        html,
+        text,
+      } as SendMailOptions);
       log.event(`email sent ${messageId}`);
     } catch (err) {
       throw err;
