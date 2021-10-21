@@ -18,6 +18,13 @@ declare global {
         PWD: string;
         pkg: PackageJson;
         autoload: Middleware[];
+        config: {
+          [key: string]: any;
+          mailer?: {
+            from?: string;
+            templates?: string;
+          };
+        };
       };
     }
   }
@@ -26,6 +33,7 @@ declare global {
 (global.__$NEXT_SAAS__ as any) = {};
 global.__$NEXT_SAAS__.PWD = process.cwd();
 global.__$NEXT_SAAS__.pkg = readPkg();
+global.__$NEXT_SAAS__.config = global.__$NEXT_SAAS__.pkg['next-saas'] || {};
 global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
   const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
 
