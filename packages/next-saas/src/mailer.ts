@@ -1,10 +1,8 @@
-import { resolve, join } from 'path';
+import { resolve } from 'path';
 import { readFile } from 'fs/promises';
 import { compile } from 'handlebars';
 import nodemailer, { SendMailOptions } from 'nodemailer';
-import NodeMailer from 'nodemailer/lib/mailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import * as log from 'next/dist/build/output/log';
+import aws, { SES } from 'aws-sdk';
 
 export type Address = {
   name: string;
@@ -23,56 +21,44 @@ export type SendParams<Values = Record<string, any>> = {
   replyTo?: Recipient;
 };
 
-export class Mailer {
-  private transport: NodeMailer<SMTPTransport.SentMessageInfo>;
+export const send = async <Values>({ template, values, from, ...envelope }: SendParams<Values>) => {
+  const transport =
+    global.__$NEXT_SAAS__.config.mailer?.transport === 'SES'
+      ? {
+          aws,
+          SES: new SES({
+            region: process.env.AWS_REGION,
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          }),
+        }
+      : {
+          host: process.env.MAIL_HOST,
+          port: (process.env.MAIL_PORT || 587) as number,
+          secure: Boolean(process.env.MAIL_SECURE || false),
+          auth: {
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASSWORD,
+          },
+        };
 
-  constructor() {
-    this.transport = nodemailer.createTransport(
-      new SMTPTransport({
-        host: process.env.MAIL_HOST,
-        port: (process.env.MAIL_PORT || 587) as number,
-        secure: Boolean(process.env.MAIL_SECURE || false),
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
-        },
-      })
-    );
-  }
-
-  private async render(view: string, values: Record<string, any> = {}) {
-    console.log(global.__$NEXT_SAAS__.config);
-    const template = await readFile(
+  try {
+    const tpl = await readFile(
       resolve(
         global.__$NEXT_SAAS__.config.mailer?.templates || resolve(global.__$NEXT_SAAS__.PWD, 'mailables'),
-        `${view}.html`
+        `${template}.html`
       ),
       'utf-8'
     );
-    console.log(template);
-    const html = compile(template)(values);
-
-    return {
-      html,
+    const result = await nodemailer.createTransport(transport).sendMail({
+      ...envelope,
+      from: global.__$NEXT_SAAS__.config.mailer?.from || from,
+      html: compile(tpl)(values),
       text: undefined,
-    };
+    } as SendMailOptions);
+
+    return result;
+  } catch (err) {
+    throw err;
   }
-
-  public async send<Values>({ template, values, from, ...envelope }: SendParams<Values>) {
-    const { html, text } = await this.render(template, values);
-
-    try {
-      const { messageId } = await this.transport.sendMail({
-        ...envelope,
-        from: global.__$NEXT_SAAS__.config.mailer?.from || from,
-        html,
-        text,
-      } as SendMailOptions);
-      log.event(`email sent ${messageId}`);
-    } catch (err) {
-      throw err;
-    }
-  }
-}
-
-export const mailer = new Mailer();
+};

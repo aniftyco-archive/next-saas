@@ -1,7 +1,7 @@
 export * from './api-handler';
 export * from './errors';
 export * from './queue';
-export * from './mailer';
+export * as mailer from './mailer';
 export { prisma as db } from './prisma';
 export { prisma } from './prisma'; // deprecated, will be removed
 export { default } from './api-handler';

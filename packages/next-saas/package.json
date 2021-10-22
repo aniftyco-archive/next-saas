@@ -30,6 +30,7 @@
   },
   "peerDependencies": {
     "@prisma/client": "^2.28.0",
+    "aws-sdk": "^2.1012.0",
     "next": "^11.0.1",
     "prisma": "^2.28.0"
   },

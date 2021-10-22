@@ -21,6 +21,7 @@ declare global {
         config: {
           [key: string]: any;
           mailer?: {
+            transport: 'SES' | 'SMTP';
             from?: string;
             templates?: string;
           };
