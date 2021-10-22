@@ -10,7 +10,7 @@ export const saasWorker: cliCommand = () => {
   log.ready('started queue worker');
 
   const handlers = readdirSync(jobsDir).reduce((handlers, filename) => {
-    const { handler } = require(resolve(jobsDir, filename));
+    const { default: handler } = require(resolve(jobsDir, filename));
 
     handlers[basename(filename, '.ts')] = handler;
 
