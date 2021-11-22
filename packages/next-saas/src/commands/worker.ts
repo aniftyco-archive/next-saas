@@ -1,6 +1,6 @@
-import { resolve, basename } from 'path';
-import { readdirSync } from 'fs';
 import * as log from 'next/dist/build/output/log';
+import { readdirSync } from 'fs';
+import { basename, resolve } from 'path';
 import { cliCommand } from '../cli';
 import { queue } from '../queue';
 

@@ -1,5 +1,6 @@
 import cors, { CorsOptions } from 'cors';
 import { Middleware } from '../api-handler';
+
 // import config from 'next.config';
 const config = { cors: {} };
 

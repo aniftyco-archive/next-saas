@@ -1,10 +1,10 @@
-import { IncomingMessage, ServerResponse } from 'http';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
+import { IncomingMessage, ServerResponse } from 'http';
 import { APIError } from './errors';
+import middleware, { autoload } from './middleware';
 import { onError } from './middleware/onError';
 import { onNoMatch } from './middleware/onNoMatch';
-import middleware, { autoload } from './middleware';
 
 export type NextHandler = (err?: Error | APIError) => void | Promise<void>;
 
