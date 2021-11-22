@@ -1,8 +1,8 @@
-import { resolve } from 'path';
+import aws, { SES } from 'aws-sdk';
 import { readFile } from 'fs/promises';
 import { compile } from 'handlebars';
 import nodemailer, { SendMailOptions } from 'nodemailer';
-import aws, { SES } from 'aws-sdk';
+import { resolve } from 'path';
 
 export type Address = {
   name: string;
