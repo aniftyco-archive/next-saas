@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable @typescript-eslint/no-var-requires */
-import { resolve } from 'path';
 import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { resolve } from 'path';
 import { PackageJson } from 'type-fest';
-import { displayHelpForNextCommand, readPkg } from './utils';
 import { Middleware } from './api-handler';
+import { displayHelpForNextCommand, readPkg } from './utils';
 
 declare global {
   namespace NodeJS {
