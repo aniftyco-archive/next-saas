@@ -9,7 +9,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { cliCommand } from '../cli';
 
-const nextDev: cliCommand = (argv) => {
+export const saasDev: cliCommand = (argv) => {
   const validArgs: arg.Spec = {
     // Types
     '--help': Boolean,
@@ -82,7 +82,7 @@ const nextDev: cliCommand = (argv) => {
   // some set-ups that rely on listening on other interfaces
   const host = args['--hostname'];
 
-  startServer({ dir, dev: true, isNextDevCommand: true, allowRetry }, port, host)
+  startServer({ dir, dev: true, issaasDevCommand: true, allowRetry }, port, host)
     .then(async ({ app, actualPort }) => {
       const appUrl = `http://${!host || host === '0.0.0.0' ? 'localhost' : host}:${actualPort}`;
       startedDevelopmentServer(appUrl, `${host || '0.0.0.0'}:${actualPort}`);
@@ -90,9 +90,9 @@ const nextDev: cliCommand = (argv) => {
       preflight().catch(() => {});
       // Finalize server bootup:
       await app.prepare();
-      const server = await (app as any).getServer();
 
       if (global.__$NEXT_SAAS__.config?.hooks?.['post-prepare']) {
+        const server = await (app as any).getServer();
         require(resolve(global.__$NEXT_SAAS__.PWD, global.__$NEXT_SAAS__.config.hooks['post-prepare'])).default({
           app,
           server,
@@ -119,5 +119,3 @@ const nextDev: cliCommand = (argv) => {
       process.nextTick(() => process.exit(1));
     });
 };
-
-export { nextDev };
