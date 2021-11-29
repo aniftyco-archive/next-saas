@@ -7,7 +7,9 @@ import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
+import { resolve } from 'path';
 import { PackageJson } from 'type-fest';
+import { Middleware } from './api-handler';
 import { displayHelpForNextCommand } from './utils';
 
 declare global {
@@ -16,7 +18,7 @@ declare global {
       __$NEXT_SAAS__: {
         PWD: string;
         pkg: PackageJson;
-        autoload: string[];
+        autoload: Middleware[];
         config: {
           [key: string]: any;
           mailer?: {
@@ -36,7 +38,11 @@ global.__$NEXT_SAAS__.pkg = require(findUp('package.json', {
   cwd: global.__$NEXT_SAAS__.PWD,
 }));
 global.__$NEXT_SAAS__.config = global.__$NEXT_SAAS__.pkg['next-saas'] || {};
-global.__$NEXT_SAAS__.autoload = global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || [];
+global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
+  const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
+
+  return ware;
+});
 
 loadEnvConfig(global.__$NEXT_SAAS__.PWD);
 
