@@ -63,9 +63,9 @@ const commands: { [command: string]: () => Promise<cliCommand> } = {
   build: () => import('next/dist/cli/next-build').then((i) => i.nextBuild),
   start: () => import('next/dist/cli/next-start').then((i) => i.nextStart),
   export: () => Promise.resolve(unsupportedCommand('export')),
-  dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
   lint: () => import('next/dist/cli/next-lint').then((i) => i.nextLint),
+  dev: () => import('./commands/dev').then((i) => i.nextDev),
   db: () => import('./commands/db').then((i) => i.saasDb),
   worker: () => import('./commands/worker').then((i) => i.saasWorker),
 };

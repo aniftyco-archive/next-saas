@@ -8,6 +8,11 @@
     "db:generate": "saas db generate",
     "db:migrate": "saas db migrate"
   },
+  "next-saas": {
+    "hooks": {
+      "post-prepare": "./middleware/test"
+    }
+  },
   "prisma": {
     "schema": "./db/schema.prisma"
   },
