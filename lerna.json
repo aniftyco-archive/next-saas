@@ -1,4 +1,11 @@
 {
-  "packages": ["packages/*"],
-  "version": "independent"
+  "version": "independent",
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "registry": "https://registry.npmjs.org/",
+      "message": "chore(release): publish %v"
+    }
+  },
+  "packages": ["packages/*"]
 }
