@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
+import { sync as findUp } from 'next/dist/compiled/find-up';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
-/* eslint-disable @typescript-eslint/no-var-requires */
-import { resolve } from 'path';
 import { PackageJson } from 'type-fest';
-import { Middleware } from './api-handler';
-import { displayHelpForNextCommand, readPkg } from './utils';
+import { displayHelpForNextCommand } from './utils';
 
 declare global {
   namespace NodeJS {
@@ -17,7 +16,7 @@ declare global {
       __$NEXT_SAAS__: {
         PWD: string;
         pkg: PackageJson;
-        autoload: Middleware[];
+        autoload: string[];
         config: {
           [key: string]: any;
           mailer?: {
@@ -33,13 +32,11 @@ declare global {
 
 (global.__$NEXT_SAAS__ as any) = {};
 global.__$NEXT_SAAS__.PWD = process.cwd();
-global.__$NEXT_SAAS__.pkg = readPkg();
+global.__$NEXT_SAAS__.pkg = require(findUp('package.json', {
+  cwd: global.__$NEXT_SAAS__.PWD,
+}));
 global.__$NEXT_SAAS__.config = global.__$NEXT_SAAS__.pkg['next-saas'] || {};
-global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
-  const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
-
-  return ware;
-});
+global.__$NEXT_SAAS__.autoload = global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || [];
 
 loadEnvConfig(global.__$NEXT_SAAS__.PWD);
 

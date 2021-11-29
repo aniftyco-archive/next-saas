@@ -2,10 +2,10 @@ import * as Log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
 import { getProjectDir } from 'next/dist/lib/get-project-dir';
 import isError from 'next/dist/lib/is-error';
-import startServer from 'next/dist/server/lib/start-server';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { resolve } from 'path';
 import { cliCommand } from '../cli';
+import startServer from '../start-server';
 
 export const saasStart: cliCommand = (argv) => {
   const validArgs: arg.Spec = {
@@ -54,12 +54,11 @@ export const saasStart: cliCommand = (argv) => {
   }
 
   startServer({ dir }, port, host)
-    .then(async ({ app, actualPort }) => {
+    .then(async ({ app, actualPort, server }) => {
       const appUrl = `http://${host === '0.0.0.0' ? 'localhost' : host}:${actualPort}`;
       Log.ready(`started server on ${host}:${actualPort}, url: ${appUrl}`);
       await app.prepare();
       if (global.__$NEXT_SAAS__.config?.hooks?.['post-prepare']) {
-        const server = await (app as any).getServer();
         require(resolve(global.__$NEXT_SAAS__.PWD, global.__$NEXT_SAAS__.config.hooks['post-prepare'])).default({
           app,
           server,
