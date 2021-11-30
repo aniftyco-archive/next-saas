@@ -38,7 +38,7 @@ global.__$NEXT_SAAS__.pkg = require(findUp('package.json', {
   cwd: global.__$NEXT_SAAS__.PWD,
 }));
 global.__$NEXT_SAAS__.config = global.__$NEXT_SAAS__.pkg['next-saas'] || {};
-global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
+global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path: string) => {
   const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
 
   return ware;
