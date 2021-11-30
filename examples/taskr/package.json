@@ -8,11 +8,6 @@
     "db:generate": "saas db generate",
     "db:migrate": "saas db migrate"
   },
-  "next-saas": {
-    "hooks": {
-      "post-prepare": "./server"
-    }
-  },
   "prisma": {
     "schema": "./db/schema.prisma"
   },
@@ -30,9 +25,7 @@
     "next-saas": "*",
     "prisma": "^3.5.0",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "socket.io": "^4.4.0",
-    "socket.io-client": "^4.4.0"
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "@types/node": "^16.11.9",
