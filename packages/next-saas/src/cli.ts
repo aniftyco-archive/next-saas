@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
+import { sync as findUp } from 'next/dist/compiled/find-up';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
 import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { resolve } from 'path';
 import { PackageJson } from 'type-fest';
 import { Middleware } from './api-handler';
-import { displayHelpForNextCommand, readPkg } from './utils';
+import { displayHelpForNextCommand } from './utils';
 
 declare global {
   namespace NodeJS {
@@ -33,9 +34,11 @@ declare global {
 
 (global.__$NEXT_SAAS__ as any) = {};
 global.__$NEXT_SAAS__.PWD = process.cwd();
-global.__$NEXT_SAAS__.pkg = readPkg();
+global.__$NEXT_SAAS__.pkg = require(findUp('package.json', {
+  cwd: global.__$NEXT_SAAS__.PWD,
+}));
 global.__$NEXT_SAAS__.config = global.__$NEXT_SAAS__.pkg['next-saas'] || {};
-global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path) => {
+global.__$NEXT_SAAS__.autoload = (global.__$NEXT_SAAS__.pkg['next-saas']?.autoload || []).map((path: string) => {
   const { default: ware } = require(resolve(global.__$NEXT_SAAS__.PWD, path));
 
   return ware;
@@ -61,11 +64,11 @@ const unsupportedCommand = (command: string) => () => {
 };
 const commands: { [command: string]: () => Promise<cliCommand> } = {
   build: () => import('next/dist/cli/next-build').then((i) => i.nextBuild),
-  start: () => import('next/dist/cli/next-start').then((i) => i.nextStart),
   export: () => Promise.resolve(unsupportedCommand('export')),
-  dev: () => import('next/dist/cli/next-dev').then((i) => i.nextDev),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
   lint: () => import('next/dist/cli/next-lint').then((i) => i.nextLint),
+  start: () => import('./commands/start').then((i) => i.saasStart),
+  dev: () => import('./commands/dev').then((i) => i.saasDev),
   db: () => import('./commands/db').then((i) => i.saasDb),
   worker: () => import('./commands/worker').then((i) => i.saasWorker),
 };
