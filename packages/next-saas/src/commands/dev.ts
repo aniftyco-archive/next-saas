@@ -82,7 +82,7 @@ export const saasDev: cliCommand = (argv) => {
   // some set-ups that rely on listening on other interfaces
   const host = args['--hostname'];
 
-  startServer({ dir, dev: true, issaasDevCommand: true, allowRetry }, port, host)
+  startServer({ dir, dev: true, isNextDevCommand: true, allowRetry }, port, host)
     .then(async ({ app, actualPort, server }) => {
       const appUrl = `http://${!host || host === '0.0.0.0' ? 'localhost' : host}:${actualPort}`;
       startedDevelopmentServer(appUrl, `${host || '0.0.0.0'}:${actualPort}`);
