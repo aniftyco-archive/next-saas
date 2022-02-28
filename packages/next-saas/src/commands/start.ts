@@ -3,6 +3,7 @@ import arg from 'next/dist/compiled/arg/index.js';
 import { getProjectDir } from 'next/dist/lib/get-project-dir';
 import isError from 'next/dist/lib/is-error';
 import { printAndExit } from 'next/dist/server/lib/utils';
+import chalk from 'chalk';
 import { resolve } from 'path';
 import { cliCommand } from '../cli';
 import startServer from '../start-server';
@@ -59,6 +60,7 @@ export const saasStart: cliCommand = (argv) => {
       Log.ready(`started server on ${host}:${actualPort}, url: ${appUrl}`);
       await app.prepare();
       if (global.__$NEXT_SAAS__.config?.hooks?.['post-prepare']) {
+        Log.info(`Loading hook:post-prepare ${chalk.dim(global.__$NEXT_SAAS__.config.hooks['post-prepare'])}`);
         require(resolve(global.__$NEXT_SAAS__.PWD, global.__$NEXT_SAAS__.config.hooks['post-prepare'])).default({
           app,
           server,
