@@ -16,26 +16,26 @@
     "lib"
   ],
   "dependencies": {
-    "@next/env": "^12.0.4",
+    "@next/env": "^12.1.0",
     "bcrypt": "^5.0.1",
-    "bull": "^3.27.0",
+    "bull": "^4.6.2",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",
     "handlebars": "^4.7.7",
-    "next-connect": "^0.10.2",
-    "nodemailer": "^6.6.3",
+    "next-connect": "^0.12.2",
+    "nodemailer": "^6.7.2",
     "p-event": "^4.2.0",
-    "ts-node": "^10.1.0",
+    "ts-node": "^10.5.0",
     "tsconfig-paths": "^3.12.0",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
-    "@prisma/client": "^3.5.0",
-    "aws-sdk": "^2.1033.0",
-    "next": "^12.0.4",
-    "prisma": "^3.5.0",
+    "@prisma/client": "^3.10.0",
+    "aws-sdk": "^2.1082.0",
+    "next": "^12.1.0",
+    "prisma": "^3.10.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.5"
   }
 }
