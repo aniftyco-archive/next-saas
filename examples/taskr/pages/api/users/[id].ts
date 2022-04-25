@@ -1,4 +1,4 @@
-import handler, { db } from 'next-saas';
+import handler, { db, event } from 'next-saas';
 
 type QueryParams = {
   id: string;
@@ -10,8 +10,15 @@ type UpdateUserInput = {
   password: string;
 };
 
+const doBackgroundWork = (timeout = 1000) => new Promise<void>((_) => setTimeout(_, timeout));
+
 export default handler
   .get<QueryParams>(async ({ req }) => {
+    await event.emit('background-work-started', new Date());
+    doBackgroundWork().then(() => {
+      event.emit('background-work-finished', new Date());
+    });
+
     return db.user.findFirst({
       where: { id: req.query.id },
     });

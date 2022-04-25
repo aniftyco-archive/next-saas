@@ -32,7 +32,10 @@ declare global {
   }
 }
 
-(global.__$NEXT_SAAS__ as any) = {};
+global.__$NEXT_SAAS_CACHE__ = {
+  events: {},
+};
+global.__$NEXT_SAAS__ = {};
 global.__$NEXT_SAAS__.PWD = process.cwd();
 global.__$NEXT_SAAS__.pkg = require(findUp('package.json', {
   cwd: global.__$NEXT_SAAS__.PWD,
@@ -70,7 +73,6 @@ const commands: { [command: string]: () => Promise<cliCommand> } = {
   start: () => import('./commands/start').then((i) => i.saasStart),
   dev: () => import('./commands/dev').then((i) => i.saasDev),
   db: () => import('./commands/db').then((i) => i.saasDb),
-  worker: () => import('./commands/worker').then((i) => i.saasWorker),
 };
 
 const args = arg(

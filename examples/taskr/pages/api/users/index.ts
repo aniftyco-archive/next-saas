@@ -1,4 +1,4 @@
-import handler, { db } from 'next-saas';
+import handler, { db, event } from 'next-saas';
 import bcrypt from 'bcrypt';
 
 type CreateUserInput = {
@@ -9,6 +9,7 @@ type CreateUserInput = {
 
 export default handler
   .get(async () => {
+    await event.emit('get-users');
     return db.user.findMany();
   })
   .post<CreateUserInput>(async ({ req }) => {
