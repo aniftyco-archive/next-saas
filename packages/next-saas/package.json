@@ -21,10 +21,10 @@
     "cross-spawn": "^7.0.3",
     "handlebars": "^4.7.7",
     "next-connect": "^0.12.2",
-    "nodemailer": "^6.7.3",
+    "nodemailer": "^6.7.5",
     "p-event": "^4.2.0",
-    "ts-node": "^10.7.0",
-    "tsconfig-paths": "^3.14.1",
+    "ts-node": "^10.8.1",
+    "tsconfig-paths": "^4.0.0",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
