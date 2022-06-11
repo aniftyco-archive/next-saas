@@ -4,13 +4,12 @@ import * as log from 'next/dist/build/output/log';
 import arg from 'next/dist/compiled/arg/index.js';
 import { sync as findUp } from 'next/dist/compiled/find-up';
 import { NON_STANDARD_NODE_ENV } from 'next/dist/lib/constants';
-import { printAndExit } from 'next/dist/server/lib/utils';
 import { loadEnvConfig } from '@next/env';
 import chalk from 'chalk';
 import { resolve } from 'path';
 import { PackageJson } from 'type-fest';
 import { Middleware } from './api-handler';
-import { displayHelpForNextCommand } from './utils';
+import { displayHelpForNextCommand, unsupportedCommand } from './utils';
 
 declare global {
   namespace NodeJS {
@@ -62,17 +61,14 @@ loadEnvConfig(global.__$NEXT_SAAS__.PWD);
 
 const defaultCommand = 'dev';
 export type cliCommand = (argv?: string[]) => void;
-const unsupportedCommand = (command: string) => () => {
-  printAndExit(`${chalk.red('>')} ${command} is an unsupported command in next-saas.`);
-};
 const commands: { [command: string]: () => Promise<cliCommand> } = {
   build: () => import('next/dist/cli/next-build').then((i) => i.nextBuild),
   export: () => Promise.resolve(unsupportedCommand('export')),
   telemetry: () => import('next/dist/cli/next-telemetry').then((i) => i.nextTelemetry),
   lint: () => import('next/dist/cli/next-lint').then((i) => i.nextLint),
-  start: () => import('./commands/start').then((i) => i.saasStart),
-  dev: () => import('./commands/dev').then((i) => i.saasDev),
-  db: () => import('./commands/db').then((i) => i.saasDb),
+  info: () => import('next/dist/cli/next-info').then((i) => i.nextInfo),
+  start: () => import('./commands/saas-start').then((i) => i.saasStart),
+  dev: () => import('./commands/saas-dev').then((i) => i.saasDev),
 };
 
 const args = arg(
@@ -112,7 +108,7 @@ if (!foundCommand && args['--help']) {
 
     Available commands
       ${Object.keys(commands)
-        .filter((command) => ['export'].includes(command))
+        .filter((command) => !['export'].includes(command))
         .join(', ')}
 
     Options
@@ -136,7 +132,7 @@ if (args['--inspect'])
 // Make sure the `saas <subcommand> --help` case is covered
 if (args['--help']) {
   // only forward for our commands, use our internal help to write for next commands
-  if (['db', 'worker'].includes(command)) {
+  if (['start', 'dev'].includes(command)) {
     forwardedArgs.push('--help');
   } else {
     displayHelpForNextCommand(command);

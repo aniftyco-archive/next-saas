@@ -36,10 +36,13 @@ export const saasDev: cliCommand = (argv) => {
       Description
         Starts the application in development mode (hot-code reloading, error
         reporting, etc)
+      
       Usage
-        $ next dev <dir> -p <port number>
+        $ saas dev <dir> -p <port number>
+      
       <dir> represents the directory of the Next.js application.
       If no directory is provided, the current directory will be used.
+      
       Options
         --port, -p      A port number on which to start the application
         --hostname, -H  Hostname on which to start the application (default: 0.0.0.0)

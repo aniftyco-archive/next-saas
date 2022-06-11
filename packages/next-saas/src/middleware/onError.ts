@@ -7,7 +7,7 @@ export const onError = (err: APIError | Error, req: Request, res: Response) => {
     return err.render(req, res);
   }
 
-  log.error(err as unknown as string);
+  log.error(err.message);
 
   return new InternalServerError().render(req, res);
 };

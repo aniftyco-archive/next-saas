@@ -34,10 +34,13 @@ export const saasStart: cliCommand = (argv) => {
       Description
         Starts the application in production mode.
         The application should be compiled with \`next build\` first.
+      
       Usage
-        $ next start <dir> -p <port>
+        $ saas start <dir> -p <port>
+      
       <dir> represents the directory of the Next.js application.
       If no directory is provided, the current directory will be used.
+      
       Options
         --port, -p      A port number on which to start the application
         --hostname, -H  Hostname on which to start the application (default: 0.0.0.0)
@@ -59,6 +62,7 @@ export const saasStart: cliCommand = (argv) => {
       const appUrl = `http://${host === '0.0.0.0' ? 'localhost' : host}:${actualPort}`;
       Log.ready(`started server on ${host}:${actualPort}, url: ${appUrl}`);
       await app.prepare();
+
       if (global.__$NEXT_SAAS__.config?.hooks?.['post-prepare']) {
         Log.info(`Loading hook:post-prepare ${chalk.dim(global.__$NEXT_SAAS__.config.hooks['post-prepare'])}`);
         require(resolve(global.__$NEXT_SAAS__.PWD, global.__$NEXT_SAAS__.config.hooks['post-prepare'])).default({
