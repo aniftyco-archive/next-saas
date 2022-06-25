@@ -2,7 +2,7 @@
 
 > Rapid development of SaaS products with Next.js
 
-**NOTICE:** This package is currently a work in progress and has not been released. You can star and watch the repo to follow along, soon discussions will be enabled and we can discuss whats going on with things and plans as like.
+**NOTICE:** This was a failed experiment, unfortunately Next.js internals change so much that the possibility of this package being viable is too low. It breaks really easily. I apologize to those who were interested in it.
 
 ## Getting Started
 
