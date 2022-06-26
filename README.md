@@ -4,6 +4,8 @@
 
 **NOTICE:** This was a failed experiment, unfortunately Next.js internals change so much that the possibility of this package being viable is too low. It breaks really easily. I apologize to those who were interested in it.
 
+Successor is a boilerplate version instead of package version. Go follow/star it here: https://github.com/aniftyco/next-saas-starter
+
 ## Getting Started
 
 - Clone the repo locally
