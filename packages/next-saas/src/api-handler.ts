@@ -1,122 +1,65 @@
-import nc from 'next-connect';
-import { User } from '@prisma/client';
-import { IncomingMessage, ServerResponse } from 'http';
-import { APIError } from './errors';
-import middleware, { autoload } from './middleware';
-import { onError } from './middleware/onError';
-import { onNoMatch } from './middleware/onNoMatch';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc, { NextHandler } from 'next-connect';
+import * as log from 'next/dist/build/output/log';
+import Context from './context';
+import { APIError, InternalServerError, MethodNotAllowedError } from './errors';
 
-export type NextHandler = (err?: Error | APIError) => void | Promise<void>;
+export type { Request, Response } from './context';
+export type Primatives = string | number | boolean | Date;
+export type HandlerResponse = Primatives | Record<string, Primatives> | Primatives[] | Record<string, Primatives>[];
+export interface Registry {}
 
-export interface Request<Params = any, Body = any, Cookies = any> extends IncomingMessage {
-  id: string;
-  ipAddress: string;
-  query: Params;
-  cookies: Cookies;
-  body: Body;
-}
-
-export type Send<Type> = (body: Type) => void;
-
-export interface Response<Type = any> extends ServerResponse {
-  send: Send<Type>;
-  json: Send<Type>;
-  status: (statusCode: number) => Response<Type>;
-  redirect(url: string): Response<Type>;
-  redirect(status: number, url: string): Response<Type>;
-}
-
-export interface Context<Params = any, Body = any, Cookies = any, Type = any> {
-  req: Request<Params, Body, Cookies>;
-  res: Response<Type>;
-  request: Request<Params, Body, Cookies>;
-  response: Response<Type>;
-  user: User | null;
-}
-
-export type Middleware<Params = any, Body = any, Cookies = any, Type = any> = (
-  context: Context<Params, Body, Cookies, Type>,
+export type Handler<Params, Body, Cookies> = (
+  context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   next: NextHandler
-) => any | Promise<any>;
+) => HandlerResponse | Promise<HandlerResponse>;
 
-export type Handler<Params = any, Body = any, Cookies = any, Type = any> = (
-  cookiesontext: Context<Params, Body, Cookies, Type>
-) => any | Promise<any>;
+export type Middleware<Params = any, Body = any, Cookies = any> = (
+  context: Context<Params, Body, Cookies, keyof Registry> & Registry,
+  next: NextHandler
+) => void | Promise<void>;
 
-export type APIHandler = {
-  (handler: Handler): void;
-  use<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
-    ...handlers: Middleware<Params, Body, Cookies, Type>[]
-  ): APIHandler;
-  get<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  head<Params = Record<string, string | any>, Body = Record<string, any>, Cookies = Record<string, string>, Type = any>(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  options<
-    Params = Record<string, string | any>,
-    Body = Record<string, any>,
-    Cookies = Record<string, string>,
-    Type = any
-  >(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  post<Body = Record<string, any>, Params = Record<string, string | any>, Cookies = Record<string, string>, Type = any>(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  put<Body = Record<string, any>, Params = Record<string, string | any>, Cookies = Record<string, string>, Type = any>(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  patch<
-    Body = Record<string, any>,
-    Params = Record<string, string | any>,
-    Cookies = Record<string, string>,
-    Type = any
-  >(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
-  delete<
-    Params = Record<string, string | any>,
-    Body = Record<string, any>,
-    Cookies = Record<string, string>,
-    Type = any
-  >(
-    handler: Handler<Params, Body, Cookies, Type>
-  ): APIHandler;
+const onNoMatch = (req: NextApiRequest, res: NextApiResponse<HandlerResponse>) => {
+  return new MethodNotAllowedError().render(req, res);
 };
 
-const mwHandle = (context: Context, use: any, ...middleware: Middleware[]) => {
+const onError = (err: APIError | Error, req: NextApiRequest, res: NextApiResponse) => {
+  if (err instanceof APIError) {
+    return err.render(req, res);
+  }
+
+  log.error(err.message);
+
+  return new InternalServerError().render(req, res);
+};
+
+const handle = <Params, Body, Cookies>(
+  context: Context<Params, Body, Cookies, keyof Registry> & Registry,
+  action: Function,
+  handler: Handler<Params, Body, Cookies>
+) => {
+  return action((req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
+    return Promise.resolve(handler(context.attach({ req, res }), next)).then(res.send.bind(res));
+  });
+};
+
+const middleware = <Params, Body, Cookies>(
+  context: Context<Params, Body, Cookies, keyof Registry> & Registry,
+  use: Function,
+  ...wares: Middleware<Params, Body, Cookies>[]
+) => {
   return use(
     '/',
-    ...middleware.map((ware) => async (req: Request, res: Response, next: NextHandler) => {
-      return ware(context, next);
+    wares.map((ware) => async (req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
+      return ware(context.attach({ req, res }), next);
     })
   );
 };
 
-const handle = (context: Context, action: any, handler: Handler) =>
-  action(async (req: Request, res: Response) => {
-    const response = await handler(context);
-
-    return res.send(response);
-  });
-
-const setupContext = (context: Partial<Context>) => (req: Request, res: Response, next: NextHandler) => {
-  req.ipAddress =
-    ((req.headers['x-forwarded-for'] as string) || '').split(',').pop().trim() || req.socket.remoteAddress;
-  context.req = req;
-  context.res = res;
-
-  return next();
-};
-const proxyHandler: ProxyHandler<(handler: Handler) => APIHandler> = {
-  get: (_, method) => {
-    const context: Partial<Context> = {
-      user: null,
-    };
-
-    const instance = nc({ onNoMatch, onError }).use(setupContext(context));
+const proxyHandler: ProxyHandler<{}> = {
+  get(_: any, method: string) {
+    const instance = nc({ onNoMatch, onError });
+    const context = new Context();
 
     instance.get = handle.bind(null, context, instance.get);
     instance.head = handle.bind(null, context, instance.head);
@@ -125,26 +68,29 @@ const proxyHandler: ProxyHandler<(handler: Handler) => APIHandler> = {
     instance.put = handle.bind(null, context, instance.put);
     instance.patch = handle.bind(null, context, instance.patch);
     instance.delete = handle.bind(null, context, instance.delete);
-    instance.use = mwHandle.bind(null, context, instance.use);
+    instance.use = middleware.bind(null, context, instance.use);
 
-    return instance.use(...[...middleware, ...autoload()])[method].bind(instance);
+    return instance[method].bind(instance);
   },
 };
 
-export const handler = new Proxy((handler: Handler) => {
-  const context: Partial<Context> = {
-    user: null,
-  };
+interface Params extends Record<string, any> {}
+interface Body extends Record<string, any> {}
+interface Cookies extends Record<string, any> {}
 
-  const instance = nc({ onNoMatch, onError }).use(setupContext(context));
+interface APIHandler {
+  all<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  get<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  head<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  post<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
+  put<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
+  delete<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  options<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  trace<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
+  patch<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
+  use<P = Params, B = Body, C = Cookies>(...middleware: Middleware<P, B, C>[]): this;
+}
 
-  instance.use = mwHandle.bind(null, context, instance.use);
-
-  return instance.use(...[...middleware, ...autoload()]).all(async (req: Request, res: Response) => {
-    const response = await handler(context as Context);
-
-    return res.send(response);
-  }) as unknown;
-}, proxyHandler) as APIHandler;
+export const handler = new Proxy({}, proxyHandler) as APIHandler;
 
 export default handler;

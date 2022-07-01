@@ -1,15 +1,15 @@
-import { Request, Response } from './api-handler';
+import { NextApiRequest as Request, NextApiResponse as Response } from 'next';
 
 export class APIError<Data extends {} = Record<string, any>> extends Error {
   constructor(message: string, private statusCode: number, private type: string, private data?: Data) {
     super(message);
   }
 
-  render(req: Request<any, any, any>, res: Response<any>) {
+  render(req: Request, res: Response) {
     const response = {
       message: this.message,
       type: this.type,
-      ...(this.data && this.data),
+      ...this.data,
     };
 
     return res.status(this.statusCode).send(response);

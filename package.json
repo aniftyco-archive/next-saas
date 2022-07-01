@@ -1,5 +1,5 @@
 {
-  "name": "next-saas",
+  "name": "next-saas-repo",
   "description": "Rapid development of SaaS products with Next.js",
   "version": "0.0.0",
   "repository": "aniftyco/next-saas",
@@ -20,26 +20,21 @@
     "examples/**"
   ],
   "eslintConfig": {
-    "extends": "nifty/react"
+    "extends": "nifty/react",
+    "ignorePatterns": [
+      "*.config.js"
+    ]
   },
   "prettier": {
     "printWidth": 120,
     "singleQuote": true
   },
-  "jest": {
-    "preset": "ts-jest"
-  },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "@types/node": "^16.11.27",
-    "eslint": "^8.17.0",
+    "eslint": "^8.18.0",
     "eslint-config-nifty": "^3.3.1",
-    "jest": "^28.1.1",
     "lerna": "^5.1.1",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^28.0.4",
-    "type-fest": "^2.13.0",
-    "typescript": "4.5.5"
+    "typescript": "^4.7.4"
   }
 }

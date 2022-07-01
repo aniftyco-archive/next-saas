@@ -19,6 +19,6 @@
       "@app/*": ["./*"]
     }
   },
-  "exclude": ["node_modules", ".next"],
-  "include": ["next-env.d.ts", "saas-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "exclude": ["node_modules", ".next", ".swc"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

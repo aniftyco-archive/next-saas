@@ -1,12 +1,10 @@
-import { Fragment } from 'react';
-import Head from 'next/head';
-import { HelloWorld } from 'components/HelloWorld';
+import { Fragment, FunctionComponent } from 'react';
+import { NextSeo } from 'next-seo';
+import { HelloWorld } from '@app/components/HelloWorld';
 
-const IndexPage = () => (
+const IndexPage: FunctionComponent = () => (
   <Fragment>
-    <Head>
-      <title>Next SaaS Starter</title>
-    </Head>
+    <NextSeo title="Welcome!" />
     <HelloWorld />
   </Fragment>
 );

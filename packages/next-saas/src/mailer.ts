@@ -1,6 +1,7 @@
 import aws, { SES } from 'aws-sdk';
 import { readFile } from 'fs/promises';
 import { compile } from 'handlebars';
+import { convert } from 'html-to-text';
 import nodemailer, { SendMailOptions } from 'nodemailer';
 import { resolve } from 'path';
 
@@ -23,7 +24,7 @@ export type SendParams<Values = Record<string, any>> = {
 
 export const send = async <Values>({ template, values, from, ...envelope }: SendParams<Values>) => {
   const transport =
-    global.__$NEXT_SAAS__.config.mailer?.transport === 'SES'
+    process.env.MAIL_TRANSPORT === 'SES'
       ? {
           aws,
           SES: new SES({
@@ -43,18 +44,13 @@ export const send = async <Values>({ template, values, from, ...envelope }: Send
         };
 
   try {
-    const tpl = await readFile(
-      resolve(
-        global.__$NEXT_SAAS__.config.mailer?.templates || resolve(global.__$NEXT_SAAS__.PWD, 'mailables'),
-        `${template}.html`
-      ),
-      'utf-8'
-    );
+    const tpl = await readFile(resolve(process.cwd(), template), 'utf-8');
+    const html = compile(tpl)(values);
     const result = await nodemailer.createTransport(transport).sendMail({
       ...envelope,
-      from: global.__$NEXT_SAAS__.config.mailer?.from || from,
-      html: compile(tpl)(values),
-      text: undefined,
+      from: process.env.MAIL_FROM || from,
+      html,
+      text: convert(html),
     } as SendMailOptions);
 
     return result;
