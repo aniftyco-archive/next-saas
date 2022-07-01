@@ -1,4 +1,5 @@
 import handler, { db } from 'next-saas';
+import requestId from '@app/middleware/request-id';
 
 type QueryParams = {
   id: string;
@@ -11,6 +12,7 @@ type UpdateUserInput = {
 };
 
 export default handler
+  .use(requestId())
   .get<QueryParams>(async ({ req }) => {
     return db.user.findFirst({
       where: { id: req.query.id },

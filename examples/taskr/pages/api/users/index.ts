@@ -1,5 +1,6 @@
 import handler, { db } from 'next-saas';
 import bcrypt from 'bcrypt';
+import requestId from '@app/middleware/request-id';
 
 type CreateUserInput = {
   name: string;
@@ -8,6 +9,7 @@ type CreateUserInput = {
 };
 
 export default handler
+  .use(requestId())
   .get(async () => {
     return db.user.findMany();
   })

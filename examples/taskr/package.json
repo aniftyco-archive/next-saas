@@ -28,7 +28,8 @@
     "next-seo": "^5.4.0",
     "next-themes": "^0.2.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@headlessui/react": "^1.6.5",
@@ -38,6 +39,7 @@
     "@types/node": "^16.11.41",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.7",
     "classnames": "^2.3.1",
     "fathom-client": "^3.5.0",
