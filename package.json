@@ -3,7 +3,10 @@
   "description": "Rapid development of SaaS products with Next.js",
   "version": "0.0.0",
   "repository": "aniftyco/next-saas",
-  "main": "lib/index.js",
+  "scripts": {
+    "start": "npm run build -w next-saas -- -w",
+    "example": "npm start -w next-saas-example"
+  },
   "author": {
     "name": "Nifty Development, LLC",
     "email": "support@aniftyco.com",
@@ -17,7 +20,7 @@
   ],
   "workspaces": [
     "packages/**",
-    "examples/**"
+    "example"
   ],
   "eslintConfig": {
     "extends": "nifty/react",
