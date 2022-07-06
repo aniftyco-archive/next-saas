@@ -1,5 +1,5 @@
 {
-  "name": "next-saas-example",
+  "name": "example",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -41,8 +41,7 @@
     "@types/react-dom": "^18.0.5",
     "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.7",
-    "classnames": "^2.3.1",
-    "fathom-client": "^3.5.0",
+    "clsx": "^1.2.0",
     "postcss": "^8.4.14",
     "prisma": "^4.0.0",
     "react-query": "^3.39.1",

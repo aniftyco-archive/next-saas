@@ -5,7 +5,7 @@
   "repository": "aniftyco/next-saas",
   "scripts": {
     "start": "npm run build -w next-saas -- -w",
-    "example": "npm start -w next-saas-example"
+    "example": "npm start -w example"
   },
   "author": {
     "name": "Nifty Development, LLC",
