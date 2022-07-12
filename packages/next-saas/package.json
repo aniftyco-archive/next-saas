@@ -9,7 +9,9 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "lib"
+    "lib",
+    "react.js",
+    "react.d.ts"
   ],
   "dependencies": {
     "cors": "^2.8.5",
