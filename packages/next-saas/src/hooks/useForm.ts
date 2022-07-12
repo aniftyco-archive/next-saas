@@ -76,6 +76,8 @@ export type Context = {
 };
 
 export const FormContext = createContext<Context>({} as Context);
+export const FormProvider = FormContext.Provider;
+export const FormConsumer = FormContext.Consumer;
 
 export type UseForm<Values = Record<string, Value>> = {
   onSubmit: (values: Values) => void | Promise<void>;
@@ -199,9 +201,9 @@ export const useField = ({ name, value: defaultValue, onChange = () => {}, rules
     updateValue(name, defaultValue);
 
     return () => {
-      rules.current[name] = [];
+      delete rules.current[name];
     };
-  }, [fieldRules]);
+  }, [name, defaultValue, fieldRules]);
 
   const fieldErrors = errors.filter((error) => error.name === name).map((error) => error.message);
 

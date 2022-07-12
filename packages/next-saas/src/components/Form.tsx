@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { FormContext, useForm } from '../hooks/useForm';
+import { FormProvider, useForm } from '../hooks/useForm';
 import { Field } from './Field';
 
 export type Props<Values> = {
@@ -18,11 +18,11 @@ export const Form = <V extends Record<string, any>>({
   const form = useForm({ onSubmit, options: { validateOnBlur } });
 
   return (
-    <FormContext.Provider value={form}>
+    <FormProvider value={form}>
       <form className={className} onSubmit={form.handleSubmit} method="get">
         {children}
       </form>
-    </FormContext.Provider>
+    </FormProvider>
   );
 };
 

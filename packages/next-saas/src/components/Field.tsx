@@ -20,7 +20,7 @@ export type CommonProps<Value> = {
 };
 
 export type InputProps = CommonProps<string> & {
-  type: 'text' | 'password' | 'email';
+  type: 'text' | 'password' | 'email' | 'radio';
 };
 
 export type CheckboxProps = CommonProps<boolean> & {
@@ -58,12 +58,16 @@ export const Field: FC<Props> = ({
 
   const { handleChange: onChange, handleBlur, value, errors } = useField({ name, value: defaultValue, rules });
 
-  const handleChange = (e: any) => {
+  const handleChange = ({ target }: any) => {
     if (type === 'checkbox') {
-      return onChange(e.target.checked);
+      return onChange(target.checked);
     }
 
-    return onChange(e.target.value);
+    if (type === 'radio') {
+      return onChange(defaultValue);
+    }
+
+    return onChange(target.value);
   };
 
   if (typeof value !== 'undefined') {
@@ -71,7 +75,6 @@ export const Field: FC<Props> = ({
       name,
       type,
       value,
-      id: name,
       onChange: handleChange,
       onBlur: handleBlur,
     };
@@ -98,7 +101,7 @@ export const Field: FC<Props> = ({
 
 type RendererType = Props['type'];
 type RendererProps = {
-  id: string;
+  name: string;
   options?: SelectOption[];
   onChange: (value: any) => void;
 };
@@ -118,6 +121,7 @@ const renderer = (type: RendererType, label?: string) => {
       case 'text':
       case 'password':
       case 'email':
+      case 'radio':
       default:
         return <input type={type} {...props} />;
     }
@@ -127,9 +131,9 @@ const renderer = (type: RendererType, label?: string) => {
     if (label) {
       return (
         <div>
-          {type !== 'checkbox' && <label htmlFor={props.id}>{label}</label>}
+          {type !== 'checkbox' && <label htmlFor={props.name}>{label}</label>}
           {genField(props)}
-          {type === 'checkbox' && <label htmlFor={props.id}>{label}</label>}
+          {type === 'checkbox' && <label htmlFor={props.name}>{label}</label>}
         </div>
       );
     }
