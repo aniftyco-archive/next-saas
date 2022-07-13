@@ -99,14 +99,13 @@ export const Field: FC<Props> = ({
   return null;
 };
 
-type RendererType = Props['type'];
 type RendererProps = {
   name: string;
   options?: SelectOption[];
   onChange: (value: any) => void;
 };
 
-const renderer = (type: RendererType, label?: string) => {
+const renderer = (type: Props['type'], label?: string) => {
   const genField = ({ options = [], ...props }: RendererProps) => {
     switch (type) {
       case 'select':
