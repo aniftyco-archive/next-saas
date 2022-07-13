@@ -20,6 +20,7 @@ export type Middleware<Params = any, Body = any, Cookies = any> = (
 ) => void | Promise<void>;
 
 const onNoMatch = (req: NextApiRequest, res: NextApiResponse<HandlerResponse>) => {
+  res.setHeader('Allow', (req as any).__allowed_methods.join(','));
   return new MethodNotAllowedError().render(req, res);
 };
 
@@ -68,6 +69,11 @@ const proxyHandler: ProxyHandler<{}> = {
     instance.put = handle.bind(null, context, instance.put);
     instance.patch = handle.bind(null, context, instance.patch);
     instance.delete = handle.bind(null, context, instance.delete);
+    instance.use((req, res, next) => {
+      (req as any).__allowed_methods = (instance as any).routes.map((route) => route.method).filter((r) => r.length);
+
+      return next();
+    });
     instance.use = middleware.bind(null, context, instance.use);
 
     return instance[method].bind(instance);
