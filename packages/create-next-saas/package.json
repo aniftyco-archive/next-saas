@@ -5,7 +5,7 @@
   "repository": "aniftyco/next-saas",
   "main": "dist/index.js",
   "scripts": {
-    "start": "rimraf dist && tsc --preserveWatchOutput",
+    "start": "rimraf dist && tsc --preserveWatchOutput --watch",
     "build": "rimraf dist && tsc",
     "prepublishOnly": "npm run build"
   },
