@@ -19,7 +19,7 @@ export type Rules = { [key: string]: Rule[] };
 export const rules = {
   required:
     (message = 'This field is required'): Rule =>
-    (value: string) => {
+    (value: Value) => {
       if (!value || !value.toString().length) {
         return message;
       }
@@ -72,7 +72,7 @@ export type Context = {
   setBlurred: Dispatch<SetStateAction<Blurred>>;
   hasBlurred: (name: string) => any;
   updateValue: (name: string, value: Value) => any;
-  handleSubmit: (event: FormEvent) => Promise<void>;
+  handleSubmit: (event: FormEvent) => void | Promise<void>;
 };
 
 export const FormContext = createContext<Context>({} as Context);

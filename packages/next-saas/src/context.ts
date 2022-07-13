@@ -10,8 +10,8 @@ export interface Request<Params = any, Body = any, Cookies = any> extends NextAp
 export interface Response extends NextApiResponse {}
 
 export default class Context<Params, Body, Cookies, Registry> {
-  public req: Request<Params, Body, Cookies>;
-  public res: Response;
+  public req?: Request<Params, Body, Cookies>;
+  public res?: Response;
 
   set(path: Registry, value: any) {
     return set(this, path as any, value);

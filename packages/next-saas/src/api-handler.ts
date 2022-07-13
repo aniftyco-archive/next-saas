@@ -59,7 +59,7 @@ const middleware = <Params, Body, Cookies>(
 
 const proxyHandler: ProxyHandler<{}> = {
   get(_: any, method: string) {
-    const instance = nc({ onNoMatch, onError });
+    const instance: any = nc({ onNoMatch, onError });
     const context = new Context();
 
     instance.get = handle.bind(null, context, instance.get);
@@ -69,8 +69,8 @@ const proxyHandler: ProxyHandler<{}> = {
     instance.put = handle.bind(null, context, instance.put);
     instance.patch = handle.bind(null, context, instance.patch);
     instance.delete = handle.bind(null, context, instance.delete);
-    instance.use((req, _, next) => {
-      (req as any).__allowed_methods = (instance as unknown as { routes: { method: string }[] }).routes
+    instance.use((req: any, _: any, next: Function) => {
+      req.__allowed_methods = (instance as { routes: { method: string }[] }).routes
         .map((route) => route.method)
         .filter((r) => r.length);
 
