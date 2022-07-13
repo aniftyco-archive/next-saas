@@ -6,8 +6,11 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+    "start": {
+      "cache": false
+    },
     "example#start": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^start"],
       "outputs": [".next/**"],
       "cache": false
     }
