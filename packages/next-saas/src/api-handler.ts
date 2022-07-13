@@ -9,12 +9,12 @@ export type Primatives = string | number | boolean | Date;
 export type HandlerResponse = Primatives | Record<string, Primatives> | Primatives[] | Record<string, Primatives>[];
 export interface Registry {}
 
-export type Handler<Params, Body, Cookies> = (
+export type Handler<Params extends {} = {}, Body extends {} = {}, Cookies extends {} = {}> = (
   context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   next: NextHandler
-) => HandlerResponse | Promise<HandlerResponse>;
+) => void | Promise<void> | HandlerResponse | Promise<HandlerResponse>;
 
-export type Middleware<Params = any, Body = any, Cookies = any> = (
+export type Middleware<Params extends {} = {}, Body extends {} = {}, Cookies extends {} = {}> = (
   context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   next: NextHandler
 ) => void | Promise<void>;
@@ -34,14 +34,24 @@ const onError = (err: APIError | Error, req: NextApiRequest, res: NextApiRespons
   return new InternalServerError().render(req, res);
 };
 
+const middlewareAction =
+  <Params, Body, Cookies>(context: Context<Params, Body, Cookies, keyof Registry>, ware: Function) =>
+  async (req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
+    return ware(context.attach({ req, res }), next);
+  };
+
 const handle = <Params, Body, Cookies>(
   context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   action: Function,
-  handler: Handler<Params, Body, Cookies>
+  ...handlers: Handler<Params, Body, Cookies>[]
 ) => {
-  return action((req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
-    return Promise.resolve(handler(context.attach({ req, res }), next)).then(res.send.bind(res));
-  });
+  const handler: Handler<Params, Body, Cookies> = handlers.pop();
+  return action(
+    ...handlers.map((ware) => middlewareAction(context, ware)),
+    (req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
+      return Promise.resolve(handler(context.attach({ req, res }), next)).then(res.send.bind(res));
+    }
+  );
 };
 
 const middleware = <Params, Body, Cookies>(
@@ -50,10 +60,8 @@ const middleware = <Params, Body, Cookies>(
   ...wares: Middleware<Params, Body, Cookies>[]
 ) => {
   return use(
-    '/',
-    wares.map((ware) => async (req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
-      return ware(context.attach({ req, res }), next);
-    })
+    '',
+    wares.map((ware) => middlewareAction(context, ware))
   );
 };
 
@@ -87,15 +95,15 @@ interface Body extends Record<string, any> {}
 interface Cookies extends Record<string, any> {}
 
 interface APIHandler {
-  all<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  get<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  head<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  post<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
-  put<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
-  delete<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  options<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  trace<P = Params, B = Body, C = Cookies>(handler: Handler<P, B, C>): this;
-  patch<B = Body, P = Params, C = Cookies>(handler: Handler<P, B, C>): this;
+  all<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  get<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  head<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  post<B = Body, P = Params, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  put<B = Body, P = Params, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  delete<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  options<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  trace<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
+  patch<B = Body, P = Params, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
   use<P = Params, B = Body, C = Cookies>(...middleware: Middleware<P, B, C>[]): this;
 }
 
