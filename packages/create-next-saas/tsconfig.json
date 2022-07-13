@@ -9,6 +9,7 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true,
     "pretty": true,
+    "strict": true,
     "jsx": "react-jsx",
     "declaration": true,
     "baseUrl": "./src",
