@@ -69,8 +69,10 @@ const proxyHandler: ProxyHandler<{}> = {
     instance.put = handle.bind(null, context, instance.put);
     instance.patch = handle.bind(null, context, instance.patch);
     instance.delete = handle.bind(null, context, instance.delete);
-    instance.use((req, res, next) => {
-      (req as any).__allowed_methods = (instance as any).routes.map((route) => route.method).filter((r) => r.length);
+    instance.use((req, _, next) => {
+      (req as any).__allowed_methods = (instance as unknown as { routes: { method: string }[] }).routes
+        .map((route) => route.method)
+        .filter((r) => r.length);
 
       return next();
     });
