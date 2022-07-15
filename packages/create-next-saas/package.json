@@ -3,6 +3,7 @@
   "description": "Rapid development of SaaS products with Next.js",
   "version": "0.0.0",
   "repository": "aniftyco/next-saas",
+  "private": true,
   "main": "dist/index.js",
   "scripts": {
     "start": "rimraf dist && tsc --preserveWatchOutput --watch",
