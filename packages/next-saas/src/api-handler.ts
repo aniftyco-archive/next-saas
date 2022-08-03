@@ -6,7 +6,12 @@ import { APIError, InternalServerError, MethodNotAllowedError } from './errors';
 
 export type { Request, Response } from './context';
 export type Primatives = string | number | boolean | Date;
-export type HandlerResponse = Primatives | Record<string, Primatives> | Primatives[] | Record<string, Primatives>[];
+export type HandlerResponse =
+  | Primatives
+  | Record<string, Primatives>
+  | Primatives[]
+  | Record<string, Primatives>[]
+  | undefined;
 export interface Registry {}
 
 export type Handler<Params extends {} = {}, Body extends {} = {}, Cookies extends {} = {}> = (
@@ -49,7 +54,11 @@ const handle = <Params, Body, Cookies>(
   return action(
     ...handlers.map((ware) => middlewareAction(context, ware)),
     (req: NextApiRequest, res: NextApiResponse<HandlerResponse>, next: NextHandler) => {
-      return Promise.resolve(handler(context.attach({ req, res }), next)).then(res.send.bind(res));
+      return Promise.resolve(handler(context.attach({ req, res }), next)).then((body) => {
+        if (body) {
+          return res.send(body);
+        }
+      });
     }
   );
 };
