@@ -9,19 +9,21 @@ import { Header } from '@app/components/Header';
 import { Hero } from '@app/components/Hero';
 import { Pricing } from '@app/components/Pricing';
 
-const IndexPage: NextPage = () => (
-  <Fragment>
-    <NextSeo title="Monitor your websites 24/7/365" />
-    <Header />
-    <main>
-      <Hero />
-      <Features />
-      <CallToAction />
-      <Pricing />
-      <Faqs />
-    </main>
-    <Footer />
-  </Fragment>
-);
+const IndexPage: NextPage = () => {
+  return (
+    <Fragment>
+      <NextSeo title="Monitor your websites 24/7/365" />
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <CallToAction />
+        <Pricing />
+        <Faqs />
+      </main>
+      <Footer />
+    </Fragment>
+  );
+};
 
 export default IndexPage;
