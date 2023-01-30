@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "next dev --port 3000",
+    "start": "next dev --port 9000",
     "build": "next build"
   },
   "prisma": {
