@@ -1,18 +1,14 @@
-import { NextApiRequest as Request, NextApiResponse as Response } from 'next';
-
 export class APIError<Data extends {} = Record<string, any>> extends Error {
-  constructor(message: string, private statusCode: number, private type: string, private data?: Data) {
+  constructor(public message: string, public statusCode: number, private type: string, private data?: Data) {
     super(message);
   }
 
-  render(req: Request, res: Response) {
-    const response = {
+  toJSON() {
+    return {
       message: this.message,
       type: this.type,
       ...this.data,
     };
-
-    return res.status(this.statusCode).send(response);
   }
 }
 

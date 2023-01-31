@@ -1,10 +1,16 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { GetServerSidePropsResult, NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
+import { MaybePromise } from 'next-runtime';
+import { ParsedUrlQuery } from 'next-runtime/types/querystring';
 import * as log from 'next/dist/build/output/log';
 import Context from './context';
 import { APIError, InternalServerError, MethodNotAllowedError } from './errors';
+import runtime, { Runtime } from './runtime';
 
 export type { Request, Response } from './context';
+
+export interface Registry {}
+
 export type Primatives = string | number | boolean | Date;
 export type HandlerResponse =
   | Primatives
@@ -12,31 +18,35 @@ export type HandlerResponse =
   | Primatives[]
   | Record<string, Primatives>[]
   | undefined;
-export interface Registry {}
 
 export type Handler<Params extends {} = {}, Body extends {} = {}, Cookies extends {} = {}> = (
   context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   next: NextHandler
-) => void | Promise<void> | HandlerResponse | Promise<HandlerResponse>;
+) => MaybePromise<void> | MaybePromise<HandlerResponse>;
 
 export type Middleware<Params extends {} = {}, Body extends {} = {}, Cookies extends {} = {}> = (
   context: Context<Params, Body, Cookies, keyof Registry> & Registry,
   next: NextHandler
-) => void | Promise<void>;
+) => MaybePromise<void>;
 
 const onNoMatch = (req: NextApiRequest, res: NextApiResponse<HandlerResponse>) => {
   res.setHeader('Allow', (req as any).__allowed_methods.join(','));
-  return new MethodNotAllowedError().render(req, res);
+  const err = new MethodNotAllowedError();
+
+  res.status(err.statusCode);
+
+  return res.send(err.toJSON());
 };
 
 const onError = (err: APIError | Error, req: NextApiRequest, res: NextApiResponse) => {
-  if (err instanceof APIError) {
-    return err.render(req, res);
+  if (!(err instanceof APIError)) {
+    log.error(err);
+    err = new InternalServerError();
   }
 
-  log.error(err.message);
+  res.status((err as APIError).statusCode);
 
-  return new InternalServerError().render(req, res);
+  return res.send((err as APIError).toJSON());
 };
 
 const middlewareAction =
@@ -103,7 +113,14 @@ interface Params extends Record<string, any> {}
 interface Body extends Record<string, any> {}
 interface Cookies extends Record<string, any> {}
 
-interface APIHandler {
+interface API {
+  <
+    Props extends Record<string, any>,
+    Query extends ParsedUrlQuery = ParsedUrlQuery,
+    Body extends Record<string, unknown> = Record<string, unknown>
+  >(
+    runtime: Runtime<Props, Query, Body>
+  ): Promise<GetServerSidePropsResult<Props>>;
   all<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
   get<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
   head<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
@@ -116,6 +133,6 @@ interface APIHandler {
   use<P = Params, B = Body, C = Cookies>(...middleware: Middleware<P, B, C>[]): this;
 }
 
-export const handler = new Proxy({}, proxyHandler) as APIHandler;
+export const handler = new Proxy(runtime, proxyHandler) as API;
 
 export default handler;
