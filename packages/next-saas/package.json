@@ -21,7 +21,8 @@
     "lodash": "^4.17.21",
     "next-connect": "^0.12.2",
     "next-runtime": "^2.4.1",
-    "nodemailer": "^6.7.5"
+    "nodemailer": "^6.7.5",
+    "type-fest": "^3.5.7"
   },
   "devDependencies": {
     "@prisma/client": "^4.0.0",
