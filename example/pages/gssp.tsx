@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
-import { NextPage } from 'next';
-import handler from 'next-saas';
+import handler, { InferProps, Page } from 'next-saas';
 
 type Props = {
   foo: string;
-  bar: string;
+  bar: number;
+  date: Date;
   baz?: string;
 };
 
@@ -16,14 +16,14 @@ type Body = {
 
 export const getServerSideProps = handler<Props, Query, Body>({
   loader() {
-    return { foo: '123', bar: '456' };
+    return { foo: '123', bar: 456, date: new Date() };
   },
   async action({ req }) {
-    return { foo: '123', bar: '456', baz: req.body.baz };
+    return { foo: '123', bar: 456, baz: req.body.baz, date: new Date() };
   },
 });
 
-const GSSP: NextPage<Props> = (props) => {
+const GSSP: Page<InferProps<typeof getServerSideProps>> = (props) => {
   return (
     <Fragment>
       <strong>gSSP Props:</strong>

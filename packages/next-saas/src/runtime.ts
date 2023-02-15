@@ -42,7 +42,8 @@ const handle = (handler: Function) => {
     try {
       const response = await handler(ctx);
 
-      return json(response);
+      // gSSP errors on non-serialized objects.
+      return json(JSON.parse(JSON.stringify(response)));
     } catch (err) {
       if (err instanceof RedirectResponse) {
         return runtimeRedirect(err.destination, { status: err.statusCode, headers: err.headers as any });

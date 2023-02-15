@@ -1,8 +1,9 @@
-import { GetServerSidePropsResult, NextApiRequest, NextApiResponse } from 'next';
+import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
 import { MaybePromise } from 'next-runtime';
 import { ParsedUrlQuery } from 'next-runtime/types/querystring';
 import * as log from 'next/dist/build/output/log';
+
 import Context from './context';
 import { APIError, InternalServerError, MethodNotAllowedError } from './errors';
 import runtime, { Runtime } from './runtime';
@@ -120,7 +121,7 @@ interface API {
     Body extends Record<string, unknown> = Record<string, unknown>
   >(
     runtime: Runtime<Props, Query, Body>
-  ): Promise<GetServerSidePropsResult<Props>>;
+  ): GetServerSideProps<Props, Query>;
   all<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
   get<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;
   head<P = Params, B = Body, C = Cookies>(...handlers: Handler<P, B, C>[]): this;

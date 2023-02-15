@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { NextPage } from 'next';
+import { Page } from 'next-saas';
 
-const ChatPage: NextPage = () => {
+const ChatPage: Page = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [message, setMessage] = useState('');
 

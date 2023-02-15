@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { NextPage } from 'next';
+import { Page } from 'next-saas';
 import { NextSeo } from 'next-seo';
 import { CallToAction } from '@app/components/CallToAction';
 import { Faqs } from '@app/components/Faqs';
@@ -9,7 +9,7 @@ import { Header } from '@app/components/Header';
 import { Hero } from '@app/components/Hero';
 import { Pricing } from '@app/components/Pricing';
 
-const IndexPage: NextPage = () => {
+const IndexPage: Page = () => {
   return (
     <Fragment>
       <NextSeo title="Monitor your websites 24/7/365" />
