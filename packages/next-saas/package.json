@@ -1,7 +1,7 @@
 {
   "name": "next-saas",
   "description": "Rapid development of SaaS products with Next.js",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "repository": "aniftyco/next-saas",
   "main": "dist/index.js",
   "scripts": {
