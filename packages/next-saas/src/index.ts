@@ -10,6 +10,7 @@ export { default } from './api-handler';
 export { redirect, notFound } from './runtime';
 
 export type { InferProps } from './runtime';
+export type { SeedRunner, Seeder } from './seeder';
 
 export type Page<Props = {}, IP = {}> = NextPage<Jsonify<Props>, IP>;
 
