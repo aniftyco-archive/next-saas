@@ -3,7 +3,6 @@ import nc, { NextHandler } from 'next-connect';
 import { MaybePromise } from 'next-runtime';
 import { ParsedUrlQuery } from 'next-runtime/types/querystring';
 import * as log from 'next/dist/build/output/log';
-
 import Context from './context';
 import { APIError, InternalServerError, MethodNotAllowedError } from './errors';
 import runtime, { Runtime } from './runtime';
@@ -69,6 +68,8 @@ const handle = <Params, Body, Cookies>(
         if (body) {
           return res.send(body);
         }
+
+        return res.end();
       });
     }
   );
